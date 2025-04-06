@@ -1,12 +1,25 @@
 import express from 'express';
-import { createLoanApplication, getAllLoanApplications, updateLoanStatus } from '../controllers/loanController';
+import { 
+  createLoanApplication, 
+  getAllLoanApplications, 
+  updateLoanStatus,
+  getUserLoanApplications
+} from '../controllers/loanController';
 import { authenticate } from '../middleware/authMiddleware';
-import { authorize } from '../middleware/roleMiddleware';
+import { authorizeRoles } from '../middleware/roleMiddleware';
 
 const router = express.Router();
 
-router.post('/', authenticate, authorize(['verifier', 'admin']), createLoanApplication);
-router.get('/', authenticate, authorize(['admin']), getAllLoanApplications);
-router.patch('/:id', authenticate, authorize(['admin', 'verifier']), updateLoanStatus);
+// Create a new loan application (both verifier and admin)
+router.post('/', authenticate, authorizeRoles('verifier', 'admin'), createLoanApplication);
+
+// Get all loan applications (admin only)
+router.get('/', authenticate, authorizeRoles('admin'), getAllLoanApplications);
+
+// Get user's own loan applications
+router.get('/my-loans', authenticate, getUserLoanApplications);
+
+// Update loan status (both roles, but with restrictions in controller)
+router.patch('/:id/status', authenticate, authorizeRoles('admin', 'verifier'), updateLoanStatus);
 
 export default router;
