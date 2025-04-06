@@ -8,7 +8,6 @@ import authRoutes from './routes/authRoutes';
 import loanRoutes from './routes/loanRoutes';
 
 
-
 dotenv.config();
 
 const app = express(); // ✅ Declare this before using it
